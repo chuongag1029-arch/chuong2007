@@ -1,0 +1,222 @@
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --ink: #183153;
+    --muted: #6c7d96;
+    --blue: #4263eb;
+    --purple: #7950f2;
+    --pink: #f06595;
+    --border: #e6eaf2;
+    --white: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    padding: 48px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--ink);
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background:
+        radial-gradient(circle at 12% 18%, #c5f6fa 0, transparent 27%),
+        radial-gradient(circle at 88% 15%, #e5dbff 0, transparent 30%),
+        radial-gradient(circle at 85% 88%, #ffdeeb 0, transparent 28%),
+        #f5f7ff;
+}
+
+/* Tiêu đề */
+h1 {
+    margin: 0 0 26px;
+    color: var(--ink);
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    text-align: center;
+}
+
+h1::before {
+    content: '✦ ';
+    color: var(--pink);
+}
+
+/* Khung nội dung chính */
+body > * {
+    width: 100%;
+}
+
+body {
+    flex-direction: column;
+}
+
+body > h1,
+body > label,
+body > input,
+body > button,
+body > h3,
+body > p {
+    max-width: 620px;
+}
+
+body > h1 {
+    margin-bottom: 28px;
+}
+
+/* Nhãn nhập liệu */
+label {
+    margin: 12px 0 8px;
+    color: var(--ink);
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+/* Ô nhập */
+input[type="text"],
+input[type="number"] {
+    width: min(100%, 620px);
+    min-height: 52px;
+    padding: 14px 16px;
+    border: 2px solid var(--border);
+    border-radius: 15px;
+    outline: none;
+    color: var(--ink);
+    background: var(--white);
+    font: inherit;
+    font-size: 1rem;
+    box-shadow: 0 5px 16px rgba(44, 62, 100, 0.04);
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+input::placeholder {
+    color: #a6b1c2;
+}
+
+input:focus {
+    border-color: #748ffc;
+    box-shadow: 0 0 0 4px rgba(66, 99, 235, 0.13);
+    transform: translateY(-1px);
+}
+
+/* Nút chức năng */
+button {
+    min-height: 50px;
+    margin: 12px 6px 0 0;
+    padding: 0 24px;
+    border: 0;
+    border-radius: 14px;
+    color: white;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    font: inherit;
+    font-size: 0.96rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 9px 18px rgba(91, 82, 220, 0.22);
+    transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+}
+
+button:hover {
+    transform: translateY(-3px);
+    filter: brightness(1.06);
+    box-shadow: 0 13px 24px rgba(91, 82, 220, 0.28);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* Tiêu đề kết quả */
+h3 {
+    margin: 30px 0 10px;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+/* Kết quả */
+#result {
+    width: min(100%, 620px);
+    min-height: 64px;
+    margin: 0;
+    padding: 18px;
+    overflow-wrap: anywhere;
+    border: 1px solid #dce4ff;
+    border-radius: 16px;
+    color: #364fc7;
+    background: linear-gradient(135deg, #eef2ff, #f8f0ff);
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.6;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* Hiển thị đẹp trên điện thoại */
+@media (max-width: 520px) {
+    body {
+        padding: 32px 18px;
+        align-items: stretch;
+    }
+
+    body > h1,
+    body > label,
+    body > input,
+    body > button,
+    body > h3,
+    body > p {
+        max-width: none;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    button {
+        width: 100%;
+        margin: 9px 0 0;
+    }
+}#steps {
+    width: min(100%, 620px);
+    margin-top: 18px;
+    padding: 20px;
+    border: 1px solid #e3e8f4;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 8px 24px rgba(44, 62, 100, 0.06);
+}
+
+#steps h3 {
+    margin: 0 0 12px;
+    color: #183153;
+}
+
+#stepsContent p {
+    color: #6c7d96;
+    line-height: 1.6;
+}
+
+#stepsContent ol {
+    display: grid;
+    gap: 9px;
+    margin: 14px 0 0;
+    padding-left: 28px;
+}
+
+#stepsContent li {
+    padding: 10px 12px;
+    border-radius: 10px;
+    color: #344563;
+    background: #f5f7ff;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+#stepsContent code {
+    padding: 2px 6px;
+    border-radius: 6px;
+    color: #4c45c7;
+    background: #e9eaff;
+    font-weight: 700;
+}

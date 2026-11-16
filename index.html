@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mã hóa Caesar 36 ký tự</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Mã hóa Caesar 36 ký tự</h1>
+
+    <label for="message">Nhập chuỗi:</label><br>
+    <input type="text" id="message" placeholder="Ví dụ: CODE2026">
+    <br><br>
+
+    <label for="key">Nhập khóa k:</label><br>
+    <input type="number" id="key" value="4">
+    <br><br>
+
+    <button onclick="encrypt()">Mã hóa</button>
+    <button onclick="decrypt()">Giải mã</button>
+
+    <h3>Kết quả:</h3>
+    <p id="result"></p>
+
+    <section id="steps">
+        <h3>Các bước giải</h3>
+        <div id="stepsContent"></div>
+    </section>
+
+    <script>
+        const M = 36;
+
+        // a-z tương ứng 0-25; 0-9 tương ứng 26-35
+        function charToNumber(c) {
+            const lower = c.toLowerCase();
+
+            if (lower >= 'a' && lower <= 'z') {
+                return lower.charCodeAt(0) - 'a'.charCodeAt(0);
+            }
+
+            if (c >= '0' && c <= '9') {
+                return c.charCodeAt(0) - '0'.charCodeAt(0) + 26;
+            }
+
+            return -1;
+        }
+
+        // Đổi số 0-35 về chữ cái hoặc chữ số
+        function numberToChar(number, uppercase) {
+            let result;
+
+            if (number < 26) {
+                result = String.fromCharCode('a'.charCodeAt(0) + number);
+
+                if (uppercase) {
+                    result = result.toUpperCase();
+                }
+            } else {
+                result = String.fromCharCode('0'.charCodeAt(0) + number - 26);
+            }
+
+            return result;
+        }
+
+        // Mã hóa hoặc giải mã chuỗi
+        function transform(text, key, isDecrypt) {
+            key = ((key % M) + M) % M;
+
+            let result = '';
+
+            for (let i = 0; i < text.length; i++) {
+                const c = text[i];
+                const value = charToNumber(c);
+
+                // Giữ nguyên dấu câu, khoảng trắng và ký tự ngoài bảng
+                if (value === -1) {
+                    result += c;
+                    continue;
+                }
+
+                let newValue;
+
+                if (isDecrypt) {
+                    newValue = ((value - key) % M + M) % M;
+                } else {
+                    newValue = (value + key) % M;
+                }
+
+                const uppercase = c >= 'A' && c <= 'Z';
+                result += numberToChar(newValue, uppercase);
+            }
+
+            return result;
+        }
+
+        // Tạo và hiển thị các bước tính
+        function showSteps(text, key, isDecrypt) {
+            key = ((key % M) + M) % M;
+
+            const steps = [];
+
+            for (let i = 0; i < text.length; i++) {
+                const c = text[i];
+                const value = charToNumber(c);
+
+                if (value === -1) {
+                    steps.push(
+                        `<li><code>${escapeHTML(c)}</code>: không thuộc bảng 36 ký tự nên giữ nguyên.</li>`
+                    );
+                    continue;
+                }
+
+                const uppercase = c >= 'A' && c <= 'Z';
+                const rawValue = isDecrypt ? value - key : value + key;
+                const newValue = isDecrypt
+                    ? ((rawValue % M) + M) % M
+                    : rawValue % M;
+
+                const newChar = numberToChar(newValue, uppercase);
+
+                const formula = isDecrypt
+                    ? `(${value} - ${key}) mod 36 = ${newValue}`
+                    : `(${value} + ${key}) mod 36 = ${newValue}`;
+
+                steps.push(
+                    `<li><code>${escapeHTML(c)}</code> → ${value} → ${formula} → ${newValue} → <code>${escapeHTML(newChar)}</code></li>`
+                );
+            }
+
+            const action = isDecrypt ? 'Giải mã' : 'Mã hóa';
+            const formulaText = isDecrypt
+                ? 'D(y) = (y - k) mod 36'
+                : 'E(x) = (x + k) mod 36';
+
+            document.getElementById('stepsContent').innerHTML =
+                `<p>${action} với khóa k = ${key}, theo công thức <strong>${formulaText}</strong>:</p>
+                 <ol>${steps.join('')}</ol>`;
+        }
+
+        // Hiển thị ký tự đặc biệt an toàn trong HTML
+        function escapeHTML(text) {
+            return text
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+        function encrypt() {
+            const text = document.getElementById('message').value;
+            const key = Number(document.getElementById('key').value);
+
+            if (document.getElementById('key').value.trim() === '') {
+                document.getElementById('result').textContent =
+                    'Vui lòng nhập khóa k.';
+                document.getElementById('stepsContent').innerHTML = '';
+                return;
+            }
+
+            document.getElementById('result').textContent =
+                'Chuỗi đã mã hóa: ' + transform(text, key, false);
+
+            showSteps(text, key, false);
+        }
+
+        function decrypt() {
+            const text = document.getElementById('message').value;
+            const key = Number(document.getElementById('key').value);
+
+            if (document.getElementById('key').value.trim() === '') {
+                document.getElementById('result').textContent =
+                    'Vui lòng nhập khóa k.';
+                document.getElementById('stepsContent').innerHTML = '';
+                return;
+            }
+
+            document.getElementById('result').textContent =
+                'Chuỗi đã giải mã: ' + transform(text, key, true);
+
+            showSteps(text, key, true);
+        }
+    </script>
+</body>
+</html>
