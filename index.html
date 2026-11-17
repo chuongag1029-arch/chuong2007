@@ -3,20 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mã hóa Caesar 36 ký tự</title>
+    <title>Mã hóa Caesar và Affine</title>
     <link rel="stylesheet" href="Style.css">
 </head>
 <body>
-    <h1>Mã hóa Caesar 36 ký tự</h1>
+    <h1>Mã hóa Caesar và Affine</h1>
 
     <label for="message">Nhập chuỗi:</label><br>
     <input type="text" id="message" placeholder="Ví dụ: CODE2026">
     <br><br>
 
-    <label for="key">Nhập khóa k:</label><br>
-    <input type="number" id="key" value="4">
+    <label for="algorithm">Chọn phương pháp:</label><br>
+    <select id="algorithm" onchange="updateAlgorithmFields()">
+        <option value="caesar">Caesar</option>
+        <option value="affine">Affine</option>
+    </select>
     <br><br>
 
+    <div id="caesarFields">
+        <label for="key">Nhập khóa k:</label><br>
+        <input type="number" id="key" value="4" step="1">
+    </div>
+
+    <div id="affineFields" hidden>
+        <label for="affineA">Chọn khóa a:</label><br>
+        <select id="affineA" onchange="updateAffineInverse()">
+            <option value="1">1</option>
+            <option value="5" selected>5</option>
+            <option value="7">7</option>
+            <option value="11">11</option>
+            <option value="13">13</option>
+            <option value="17">17</option>
+            <option value="19">19</option>
+            <option value="23">23</option>
+            <option value="25">25</option>
+            <option value="29">29</option>
+            <option value="31">31</option>
+            <option value="35">35</option>
+        </select>
+        <p id="affineInverseInfo"></p>
+        <br>
+
+        <label for="affineB">Nhập khóa b:</label><br>
+        <input type="number" id="affineB" value="4" step="1">
+        <p>Khóa a được chọn trong danh sách để bảo đảm có nghịch đảo modulo 36.</p>
+    </div>
+
+    <br>
     <button onclick="encrypt()">Mã hóa</button>
     <button onclick="decrypt()">Giải mã</button>
 
@@ -24,12 +57,17 @@
     <p id="result"></p>
 
     <section id="steps">
-        <h3>Các bước giải</h3>
+        <h3>Các bước tính</h3>
         <div id="stepsContent"></div>
     </section>
 
     <script>
         const M = 36;
+
+        // Đưa số về khoảng 0 đến 35
+        function mod(number, modulus) {
+            return ((number % modulus) + modulus) % modulus;
+        }
 
         // a-z tương ứng 0-25; 0-9 tương ứng 26-35
         function charToNumber(c) {
@@ -57,35 +95,32 @@
                     result = result.toUpperCase();
                 }
             } else {
-                result = String.fromCharCode('0'.charCodeAt(0) + number - 26);
+                result = String.fromCharCode(
+                    '0'.charCodeAt(0) + number - 26
+                );
             }
 
             return result;
         }
 
-        // Mã hóa hoặc giải mã chuỗi
-        function transform(text, key, isDecrypt) {
-            key = ((key % M) + M) % M;
-
+        // Mã hóa hoặc giải mã Caesar
+        function caesarTransform(text, k, isDecrypt) {
+            k = mod(k, M);
             let result = '';
 
             for (let i = 0; i < text.length; i++) {
                 const c = text[i];
                 const value = charToNumber(c);
 
-                // Giữ nguyên dấu câu, khoảng trắng và ký tự ngoài bảng
+                // Giữ nguyên ký tự ngoài bảng 36
                 if (value === -1) {
                     result += c;
                     continue;
                 }
 
-                let newValue;
-
-                if (isDecrypt) {
-                    newValue = ((value - key) % M + M) % M;
-                } else {
-                    newValue = (value + key) % M;
-                }
+                const newValue = isDecrypt
+                    ? mod(value - k, M)
+                    : mod(value + k, M);
 
                 const uppercase = c >= 'A' && c <= 'Z';
                 result += numberToChar(newValue, uppercase);
@@ -94,10 +129,87 @@
             return result;
         }
 
-        // Tạo và hiển thị các bước tính
-        function showSteps(text, key, isDecrypt) {
-            key = ((key % M) + M) % M;
+        // Ước chung lớn nhất
+        function gcd(a, b) {
+            a = Math.abs(a);
+            b = Math.abs(b);
 
+            while (b !== 0) {
+                const remainder = a % b;
+                a = b;
+                b = remainder;
+            }
+
+            return a;
+        }
+
+        // Tìm nghịch đảo modulo
+        function modInverse(a, modulus) {
+            a = mod(a, modulus);
+
+            for (let i = 1; i < modulus; i++) {
+                if ((a * i) % modulus === 1) {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        // Mã hóa hoặc giải mã Affine
+        function affineTransform(text, a, b, isDecrypt) {
+            a = mod(a, M);
+            b = mod(b, M);
+
+            const inverseA = modInverse(a, M);
+            let result = '';
+
+            for (let i = 0; i < text.length; i++) {
+                const c = text[i];
+                const value = charToNumber(c);
+
+                // Giữ nguyên ký tự ngoài bảng 36
+                if (value === -1) {
+                    result += c;
+                    continue;
+                }
+
+                const newValue = isDecrypt
+                    ? mod(inverseA * (value - b), M)
+                    : mod(a * value + b, M);
+
+                const uppercase = c >= 'A' && c <= 'Z';
+                result += numberToChar(newValue, uppercase);
+            }
+
+            return result;
+        }
+
+        // Hiện khóa Caesar hoặc các khóa Affine
+        function updateAlgorithmFields() {
+            const isAffine =
+                document.getElementById('algorithm').value === 'affine';
+
+            document.getElementById('caesarFields').hidden = isAffine;
+            document.getElementById('affineFields').hidden = !isAffine;
+
+            if (isAffine) {
+                updateAffineInverse();
+            }
+        }
+
+        // Tính và hiện a nghịch đảo
+        function updateAffineInverse() {
+            const a = Number(document.getElementById('affineA').value);
+            const inverseA = modInverse(a, M);
+
+            document.getElementById('affineInverseInfo').textContent =
+                `Nghịch đảo modulo 36: a⁻¹ = ${inverseA}, vì (${a} × ${inverseA}) mod 36 = 1.`;
+        }
+
+        // Hiện từng bước Caesar
+        function showCaesarSteps(text, k, isDecrypt) {
+            k = mod(k, M);
             const steps = [];
 
             for (let i = 0; i < text.length; i++) {
@@ -106,35 +218,81 @@
 
                 if (value === -1) {
                     steps.push(
-                        `<li><code>${escapeHTML(c)}</code>: không thuộc bảng 36 ký tự nên giữ nguyên.</li>`
+                        `<li><code>${escapeHTML(c)}</code>: ngoài bảng 36 ký tự nên giữ nguyên.</li>`
                     );
                     continue;
                 }
 
                 const uppercase = c >= 'A' && c <= 'Z';
-                const rawValue = isDecrypt ? value - key : value + key;
                 const newValue = isDecrypt
-                    ? ((rawValue % M) + M) % M
-                    : rawValue % M;
-
+                    ? mod(value - k, M)
+                    : mod(value + k, M);
                 const newChar = numberToChar(newValue, uppercase);
 
                 const formula = isDecrypt
-                    ? `(${value} - ${key}) mod 36 = ${newValue}`
-                    : `(${value} + ${key}) mod 36 = ${newValue}`;
+                    ? `(${value} - ${k}) mod 36 = ${newValue}`
+                    : `(${value} + ${k}) mod 36 = ${newValue}`;
 
                 steps.push(
                     `<li><code>${escapeHTML(c)}</code> → ${value} → ${formula} → ${newValue} → <code>${escapeHTML(newChar)}</code></li>`
                 );
             }
 
-            const action = isDecrypt ? 'Giải mã' : 'Mã hóa';
             const formulaText = isDecrypt
                 ? 'D(y) = (y - k) mod 36'
                 : 'E(x) = (x + k) mod 36';
 
             document.getElementById('stepsContent').innerHTML =
-                `<p>${action} với khóa k = ${key}, theo công thức <strong>${formulaText}</strong>:</p>
+                `<p>Caesar với k = ${k}. Công thức: <strong>${formulaText}</strong></p>
+                 <ol>${steps.join('')}</ol>`;
+        }
+
+        // Hiện từng bước Affine
+        function showAffineSteps(text, a, b, isDecrypt) {
+            a = mod(a, M);
+            b = mod(b, M);
+
+            const inverseA = modInverse(a, M);
+            const steps = [];
+
+            for (let i = 0; i < text.length; i++) {
+                const c = text[i];
+                const value = charToNumber(c);
+
+                if (value === -1) {
+                    steps.push(
+                        `<li><code>${escapeHTML(c)}</code>: ngoài bảng 36 ký tự nên giữ nguyên.</li>`
+                    );
+                    continue;
+                }
+
+                const uppercase = c >= 'A' && c <= 'Z';
+                let newValue;
+                let formula;
+
+                if (isDecrypt) {
+                    newValue = mod(inverseA * (value - b), M);
+                    formula =
+                        `${inverseA} × (${value} - ${b}) mod 36 = ${newValue}`;
+                } else {
+                    newValue = mod(a * value + b, M);
+                    formula =
+                        `(${a} × ${value} + ${b}) mod 36 = ${newValue}`;
+                }
+
+                const newChar = numberToChar(newValue, uppercase);
+
+                steps.push(
+                    `<li><code>${escapeHTML(c)}</code> → ${value} → ${formula} → ${newValue} → <code>${escapeHTML(newChar)}</code></li>`
+                );
+            }
+
+            const formulaText = isDecrypt
+                ? `D(y) = a⁻¹(y - b) mod 36; a⁻¹ = ${inverseA}`
+                : 'E(x) = (a × x + b) mod 36';
+
+            document.getElementById('stepsContent').innerHTML =
+                `<p>Affine với a = ${a}, b = ${b}. Công thức: <strong>${formulaText}</strong></p>
                  <ol>${steps.join('')}</ol>`;
         }
 
@@ -150,37 +308,96 @@
 
         function encrypt() {
             const text = document.getElementById('message').value;
-            const key = Number(document.getElementById('key').value);
+            const algorithm = document.getElementById('algorithm').value;
+            let result;
 
-            if (document.getElementById('key').value.trim() === '') {
-                document.getElementById('result').textContent =
-                    'Vui lòng nhập khóa k.';
-                document.getElementById('stepsContent').innerHTML = '';
-                return;
+            if (algorithm === 'caesar') {
+                const keyInput = document.getElementById('key');
+                const k = Number(keyInput.value);
+
+                if (keyInput.value.trim() === '' || !Number.isInteger(k)) {
+                    alert('Vui lòng nhập khóa k là số nguyên.');
+                    return;
+                }
+
+                result = caesarTransform(text, k, false);
+                showCaesarSteps(text, k, false);
+            } else {
+                const a = Number(document.getElementById('affineA').value);
+                const bInput = document.getElementById('affineB');
+                const b = Number(bInput.value);
+
+                if (bInput.value.trim() === '' || !Number.isInteger(b)) {
+                    alert('Vui lòng nhập khóa b là số nguyên.');
+                    return;
+                }
+
+                if (gcd(a, M) !== 1) {
+                    alert('Khóa a phải nguyên tố cùng nhau với 36.');
+                    return;
+                }
+
+                result = affineTransform(text, a, b, false);
+                showAffineSteps(text, a, b, false);
             }
 
             document.getElementById('result').textContent =
-                'Chuỗi đã mã hóa: ' + transform(text, key, false);
-
-            showSteps(text, key, false);
+                'Chuỗi đã mã hóa: ' + result;
         }
 
         function decrypt() {
             const text = document.getElementById('message').value;
-            const key = Number(document.getElementById('key').value);
+            const algorithm = document.getElementById('algorithm').value;
+            let result;
 
-            if (document.getElementById('key').value.trim() === '') {
-                document.getElementById('result').textContent =
-                    'Vui lòng nhập khóa k.';
-                document.getElementById('stepsContent').innerHTML = '';
-                return;
+            if (algorithm === 'caesar') {
+                const keyInput = document.getElementById('key');
+                const k = Number(keyInput.value);
+
+                if (keyInput.value.trim() === '' || !Number.isInteger(k)) {
+                    alert('Vui lòng nhập khóa k là số nguyên.');
+                    return;
+                }
+
+                result = caesarTransform(text, k, true);
+                showCaesarSteps(text, k, true);
+            } else {
+                const a = Number(document.getElementById('affineA').value);
+                const bInput = document.getElementById('affineB');
+                const b = Number(bInput.value);
+
+                if (bInput.value.trim() === '' || !Number.isInteger(b)) {
+                    alert('Vui lòng nhập khóa b là số nguyên.');
+                    return;
+                }
+
+                if (gcd(a, M) !== 1) {
+                    alert('Khóa a phải nguyên tố cùng nhau với 36.');
+                    return;
+                }
+
+                result = affineTransform(text, a, b, true);
+                showAffineSteps(text, a, b, true);
             }
 
             document.getElementById('result').textContent =
-                'Chuỗi đã giải mã: ' + transform(text, key, true);
-
-            showSteps(text, key, true);
+                'Chuỗi đã giải mã: ' + result;
         }
+
+        // Cập nhật nghịch đảo ban đầu
+        updateAffineInverse();
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
