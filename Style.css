@@ -1,13 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 
 :root {
-    --ink: #183153;
-    --muted: #6c7d96;
-    --blue: #4263eb;
-    --purple: #7950f2;
-    --pink: #f06595;
-    --border: #e6eaf2;
-    --white: #ffffff;
+    --ink: #193153;
+    --muted: #71809a;
+    --blue: #4563ee;
+    --purple: #8050ef;
+    --border: #e1e7f2;
+    --card: rgba(255, 255, 255, 0.92);
 }
 
 * {
@@ -19,181 +18,162 @@ body {
     margin: 0;
     padding: 48px 20px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
     color: var(--ink);
     font-family: 'Be Vietnam Pro', sans-serif;
     background:
-        radial-gradient(circle at 12% 18%, #c5f6fa 0, transparent 27%),
-        radial-gradient(circle at 88% 15%, #e5dbff 0, transparent 30%),
-        radial-gradient(circle at 85% 88%, #ffdeeb 0, transparent 28%),
+        radial-gradient(circle at 8% 10%, #c9f7f7 0, transparent 32%),
+        radial-gradient(circle at 92% 12%, #e6dcff 0, transparent 32%),
+        radial-gradient(circle at 85% 90%, #ffe0ed 0, transparent 28%),
         #f5f7ff;
 }
 
-/* Tiêu đề */
+/* Căn các phần tử trực tiếp trong body vào cùng một khung */
+body > *:not(br):not(script) {
+    width: min(100%, 600px);
+}
+
+body > br {
+    display: none;
+}
+
 h1 {
-    margin: 0 0 26px;
+    margin: 4px 0 28px;
     color: var(--ink);
-    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-size: clamp(2rem, 5vw, 3rem);
     font-weight: 800;
+    line-height: 1.2;
     letter-spacing: -1.5px;
     text-align: center;
 }
 
 h1::before {
     content: '✦ ';
-    color: var(--pink);
+    color: #f06595;
 }
 
-/* Khung nội dung chính */
-body > * {
-    width: 100%;
-}
-
-body {
-    flex-direction: column;
-}
-
-body > h1,
-body > label,
-body > input,
-body > button,
-body > h3,
-body > p {
-    max-width: 620px;
-}
-
-body > h1 {
-    margin-bottom: 28px;
-}
-
-/* Nhãn nhập liệu */
 label {
-    margin: 12px 0 8px;
+    display: block;
+    margin: 16px 0 8px;
     color: var(--ink);
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     font-weight: 700;
 }
 
-/* Ô nhập */
-input[type="text"],
-input[type="number"] {
-    width: min(100%, 620px);
+/* Ô nhập chuỗi, khóa và danh sách chọn */
+input,
+select {
+    display: block;
+    width: 100%;
     min-height: 52px;
-    padding: 14px 16px;
-    border: 2px solid var(--border);
-    border-radius: 15px;
+    padding: 12px 15px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
     outline: none;
     color: var(--ink);
-    background: var(--white);
+    background-color: white;
     font: inherit;
     font-size: 1rem;
-    box-shadow: 0 5px 16px rgba(44, 62, 100, 0.04);
-    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    box-shadow: 0 5px 18px rgba(38, 58, 100, 0.05);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+select {
+    cursor: pointer;
+}
+
+input:focus,
+select:focus {
+    border-color: #879cff;
+    box-shadow: 0 0 0 4px rgba(69, 99, 238, 0.13);
 }
 
 input::placeholder {
-    color: #a6b1c2;
+    color: #a3afc1;
 }
 
-input:focus {
-    border-color: #748ffc;
-    box-shadow: 0 0 0 4px rgba(66, 99, 235, 0.13);
-    transform: translateY(-1px);
+#caesarFields,
+#affineFields {
+    margin-top: 8px;
 }
 
-/* Nút chức năng */
+#affineFields p {
+    margin: 8px 0 12px;
+    color: var(--muted);
+    font-size: 0.84rem;
+    line-height: 1.5;
+}
+
+/* Đảm bảo khu vực ẩn thực sự được ẩn */
+[hidden] {
+    display: none !important;
+}
+
+/* Nút mã hóa và giải mã */
 button {
-    min-height: 50px;
-    margin: 12px 6px 0 0;
-    padding: 0 24px;
+    width: 100%;
+    min-height: 52px;
+    margin-top: 12px;
+    padding: 12px 18px;
     border: 0;
     border-radius: 14px;
     color: white;
-    background: linear-gradient(135deg, var(--blue), var(--purple));
+    background: linear-gradient(110deg, var(--blue), var(--purple));
     font: inherit;
-    font-size: 0.96rem;
-    font-weight: 700;
+    font-size: 0.98rem;
+    font-weight: 750;
     cursor: pointer;
-    box-shadow: 0 9px 18px rgba(91, 82, 220, 0.22);
+    box-shadow: 0 9px 20px rgba(92, 82, 220, 0.2);
     transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
 }
 
 button:hover {
-    transform: translateY(-3px);
-    filter: brightness(1.06);
-    box-shadow: 0 13px 24px rgba(91, 82, 220, 0.28);
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+    box-shadow: 0 12px 24px rgba(92, 82, 220, 0.27);
 }
 
 button:active {
     transform: translateY(0);
 }
 
-/* Tiêu đề kết quả */
 h3 {
-    margin: 30px 0 10px;
+    margin: 26px 0 10px;
+    font-size: 1rem;
+    font-weight: 750;
+}
+
+#result {
+    min-height: 60px;
+    margin: 0;
+    padding: 16px;
+    overflow-wrap: anywhere;
+    border: 1px solid #dce3ff;
+    border-radius: 15px;
+    color: #4058d5;
+    background: linear-gradient(120deg, #eef2ff, #f8f1ff);
     font-size: 1rem;
     font-weight: 700;
-}
-
-/* Kết quả */
-#result {
-    width: min(100%, 620px);
-    min-height: 64px;
-    margin: 0;
-    padding: 18px;
-    overflow-wrap: anywhere;
-    border: 1px solid #dce4ff;
-    border-radius: 16px;
-    color: #364fc7;
-    background: linear-gradient(135deg, #eef2ff, #f8f0ff);
-    font-size: 1.05rem;
-    font-weight: 700;
     line-height: 1.6;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
-/* Hiển thị đẹp trên điện thoại */
-@media (max-width: 520px) {
-    body {
-        padding: 32px 18px;
-        align-items: stretch;
-    }
-
-    body > h1,
-    body > label,
-    body > input,
-    body > button,
-    body > h3,
-    body > p {
-        max-width: none;
-    }
-
-    h1 {
-        font-size: 2rem;
-    }
-
-    button {
-        width: 100%;
-        margin: 9px 0 0;
-    }
-}#steps {
-    width: min(100%, 620px);
+/* Khung các bước tính */
+#steps {
     margin-top: 18px;
-    padding: 20px;
-    border: 1px solid #e3e8f4;
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 8px 24px rgba(44, 62, 100, 0.06);
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    background: var(--card);
+    box-shadow: 0 8px 24px rgba(38, 58, 100, 0.06);
 }
 
 #steps h3 {
     margin: 0 0 12px;
-    color: #183153;
 }
 
 #stepsContent p {
-    color: #6c7d96;
+    color: var(--muted);
     line-height: 1.6;
 }
 
@@ -208,7 +188,7 @@ h3 {
     padding: 10px 12px;
     border-radius: 10px;
     color: #344563;
-    background: #f5f7ff;
+    background: #f4f6ff;
     line-height: 1.6;
     overflow-wrap: anywhere;
 }
@@ -216,7 +196,23 @@ h3 {
 #stepsContent code {
     padding: 2px 6px;
     border-radius: 6px;
-    color: #4c45c7;
+    color: #5145c5;
     background: #e9eaff;
     font-weight: 700;
+}
+
+/* Hiển thị trên màn hình nhỏ */
+@media (max-width: 520px) {
+    body {
+        padding: 30px 17px;
+    }
+
+    h1 {
+        margin-bottom: 20px;
+        font-size: 2rem;
+    }
+
+    #steps {
+        padding: 15px;
+    }
 }
